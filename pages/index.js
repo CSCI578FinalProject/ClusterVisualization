@@ -1,74 +1,178 @@
-import {
-  Form,
-  Select,
-  InputNumber,
-  DatePicker,
-  Switch,
-  Slider,
-  Button,
-} from 'antd'
+import { Table, Input, Button, Icon, Layout, Typography } from 'antd';
+import Highlighter from 'react-highlight-words';
+import Link from 'next/link';
+// Modified from sample code at https://ant.design/components/table/
 
-const FormItem = Form.Item
-const Option = Select.Option
+const { Header, Content } = Layout;
+const { Title } = Typography;
 
-export default () => (
-  <div style={{ marginTop: 100 }}>
-    <Form layout="horizontal">
-      <FormItem
-        label="Input Number"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 8 }}
-      >
-        <InputNumber
-          size="large"
-          min={1}
-          max={10}
-          style={{ width: 100 }}
-          defaultValue={3}
-          name="inputNumber"
+class Index extends React.Component {
+  state = {
+    searchText: '',
+    searchedColumn: ''
+  };
+
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node;
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() =>
+            this.handleSearch(selectedKeys, confirm, dataIndex)
+          }
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
         />
-        <a href="#">Link</a>
-      </FormItem>
-
-      <FormItem label="Switch" labelCol={{ span: 8 }} wrapperCol={{ span: 8 }}>
-        <Switch defaultChecked name="switch" />
-      </FormItem>
-
-      <FormItem label="Slider" labelCol={{ span: 8 }} wrapperCol={{ span: 8 }}>
-        <Slider defaultValue={70} />
-      </FormItem>
-
-      <FormItem label="Select" labelCol={{ span: 8 }} wrapperCol={{ span: 8 }}>
-        <Select
-          size="large"
-          defaultValue="lucy"
-          style={{ width: 192 }}
-          name="select"
+        <Button
+          type="primary"
+          onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+          icon="search"
+          size="small"
+          style={{ width: 90, marginRight: 8 }}
         >
-          <Option value="jack">jack</Option>
-          <Option value="lucy">lucy</Option>
-          <Option value="disabled" disabled>
-            disabled
-          </Option>
-          <Option value="yiminghe">yiminghe</Option>
-        </Select>
-      </FormItem>
+          Search
+        </Button>
+        <Button
+          onClick={() => this.handleReset(clearFilters)}
+          size="small"
+          style={{ width: 90 }}
+        >
+          Reset
+        </Button>
+      </div>
+    ),
+    filterIcon: filtered => (
+      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        .toString()
+        .toLowerCase()
+        .includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select());
+      }
+    },
+    render: text =>
+      this.state.searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[this.state.searchText]}
+          autoEscape
+          textToHighlight={text.toString()}
+        />
+      ) : (
+        text
+      )
+  });
 
-      <FormItem
-        label="DatePicker"
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 8 }}
-      >
-        <DatePicker name="startDate" />
-      </FormItem>
-      <FormItem style={{ marginTop: 48 }} wrapperCol={{ span: 8, offset: 8 }}>
-        <Button size="large" type="primary" htmlType="submit">
-          OK
-        </Button>
-        <Button size="large" style={{ marginLeft: 8 }}>
-          Cancel
-        </Button>
-      </FormItem>
-    </Form>
-  </div>
-)
+  handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    this.setState({
+      searchText: selectedKeys[0],
+      searchedColumn: dataIndex
+    });
+  };
+
+  handleReset = clearFilters => {
+    clearFilters();
+    this.setState({ searchText: '' });
+  };
+
+  render() {
+    const { data } = this.props;
+    const dataSource = [];
+    for (let [index, key] of Object.keys(data).entries()) {
+      dataSource.push({
+        key: index,
+        cluster: key,
+        elements: data[key].join('\n')
+      });
+    }
+
+    const columns = [
+      {
+        title: 'Cluster',
+        dataIndex: 'cluster',
+        key: 'cluster',
+        ...this.getColumnSearchProps('cluster')
+      },
+      {
+        title: 'Elements',
+        dataIndex: 'elements',
+        key: 'elements',
+        ...this.getColumnSearchProps('elements')
+      },
+      {
+        title: 'Action',
+        key: 'action',
+        fixed: 'right',
+        width: 150,
+        render: (text, record) => (
+          <span>
+            <Link
+              href="/visualization/[id]"
+              as={`/visualization/${record.name}`}
+            >
+              <a>Visualize</a>
+            </Link>
+          </span>
+        )
+      }
+    ];
+
+    return (
+      <Layout>
+        <Header
+          style={{
+            padding: '0.5rem'
+          }}
+        >
+          <Title
+            style={{
+              textAlign: 'center',
+              color: '#fff'
+            }}
+          >
+            Cluster Visualization
+          </Title>
+        </Header>
+        <Content
+          style={{
+            margin: '2rem',
+            background: '#fff',
+            padding: '1rem'
+          }}
+        >
+          <Table
+            style={{
+              maxHeight: '80vh'
+            }}
+            columns={columns}
+            dataSource={dataSource}
+            scroll={{ x: 1200 }}
+          ></Table>
+        </Content>
+      </Layout>
+    );
+  }
+}
+
+Index.getInitialProps = async function() {
+  const data = await import('../parser/cluster.json');
+  return { data: data['default'] };
+};
+
+export default Index;
