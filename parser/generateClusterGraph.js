@@ -43,6 +43,8 @@ const createClusterGraph = async () => {
     for (let child of node.children) {
       children[child] = true;
     }
+    let lastIndexOfDot = node.name.lastIndexOf('.');
+    node.label = node.name.slice(lastIndexOfDot >= 0 ? lastIndexOfDot + 1 : 0);
     nodeMap[node.name].children = children;
   });
 
