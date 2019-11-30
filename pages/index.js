@@ -94,11 +94,11 @@ class Index extends React.Component {
   render() {
     const { data } = this.props;
     const dataSource = [];
-    for (let [index, key] of Object.keys(data).entries()) {
+    for (let key of Object.keys(data)) {
       dataSource.push({
-        key: index,
-        cluster: key,
-        elements: data[key].join('\n')
+        id: data[key].id,
+        cluster: data[key].cluster,
+        elements: data[key].elements.join('\n')
       });
     }
 
@@ -122,10 +122,7 @@ class Index extends React.Component {
         width: 150,
         render: (text, record) => (
           <span>
-            <Link
-              href="/visualization/[id]"
-              as={`/visualization/${record.name}`}
-            >
+            <Link href="/visualization/[id]" as={`/visualization/${record.id}`}>
               <a>Visualize</a>
             </Link>
           </span>

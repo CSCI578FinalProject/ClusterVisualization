@@ -23,3 +23,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+*.rsf
+parser/*.json
+parser/cluster-graph
+parser/*.txt
