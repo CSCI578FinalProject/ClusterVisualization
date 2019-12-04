@@ -3,6 +3,8 @@ const clusterFilename = process.argv[2];
 const graphFilename = process.argv[3];
 const folderName = process.argv[4] || 'cluster-graph';
 
+const CLUSTER_ID = 'cluster';
+
 const searchNodes = (root, nodes, edges, nodeMap, limit) => {
   let preLevel = [root];
   let nextLevel = [];
@@ -13,8 +15,22 @@ const searchNodes = (root, nodes, edges, nodeMap, limit) => {
     for (let child of children) {
       // Saves node if not existed
       if (!nodes[child]) {
-        nodes[child] = nodeMap[child];
+        nodes[child] = Object.assign({}, nodeMap[child]);
         nextLevel.push(child);
+      }
+
+      let hasEdge = false;
+      for (let edge of edges) {
+        if (
+          edge.source === nodeMap[curr].id &&
+          edge.target === nodeMap[child].id
+        ) {
+          hasEdge = true;
+          break;
+        }
+      }
+
+      if (!hasEdge) {
         // Adds an edge between curr and child
         edges.push({
           source: nodeMap[curr].id,
@@ -62,8 +78,8 @@ const createClusterGraph = async () => {
 
     // Find out the node for each element
     elements.forEach(element => {
-      clusterNodes[element] = nodeMap[element];
-      clusterNodes[element].groupId = cluster.id;
+      clusterNodes[element] = Object.assign({}, nodeMap[element]);
+      clusterNodes[element].groupId = CLUSTER_ID;
     });
 
     // Ensures edges between elements are included
@@ -89,7 +105,7 @@ const createClusterGraph = async () => {
       edges: clusterEdges,
       groups: [
         {
-          id: cluster.id,
+          id: CLUSTER_ID,
           title: cluster.cluster
         }
       ]
