@@ -1,7 +1,8 @@
 const fs = require('fs-extra');
-const clusterFilename = process.argv[2];
-const graphFilename = process.argv[3];
-const folderName = process.argv[4] || 'cluster-graph';
+const clusterFilename = process.argv[2] || 'cluster.json';
+const graphFilename = process.argv[3] || 'graph.json';
+const acdcClusterFilename = process.argv[4] || 'acdcCluster.json';
+const folderName = process.argv[5] || 'cluster-graph';
 
 const CLUSTER_ID = 'cluster';
 
@@ -51,6 +52,9 @@ const searchNodes = (root, nodes, edges, nodeMap, limit) => {
 const createClusterGraph = async () => {
   const clusters = await fs.readJson(clusterFilename);
   const graph = await fs.readJson(graphFilename);
+  const acdcClusters = await fs.readJson(acdcClusterFilename);
+  const acdcClusterMap = acdcClusters.clusterMap;
+  const acdcClassMap = acdcClusters.classMap;
 
   const nodeMap = {};
   graph.nodes.forEach(node => {
@@ -59,16 +63,28 @@ const createClusterGraph = async () => {
     for (let child of node.children) {
       children[child] = true;
     }
-    let lastIndexOfDot = node.name.lastIndexOf('.');
+
+    // Extracts function name with class as label
+    const lastIndexOfDot = node.name.lastIndexOf('.');
     node.label = node.name.slice(lastIndexOfDot >= 0 ? lastIndexOfDot + 1 : 0);
+
+    // Extracts class name
+    const classEnd = node.name.lastIndexOf(':');
+    node.className = node.name.slice(
+      0,
+      classEnd >= 0 ? classEnd : node.name.length
+    );
+
+    // Find out elements original ACDC clusters
+    node.acdcCluster = acdcClassMap[node.className];
     nodeMap[node.name].children = children;
   });
 
   for (let key of Object.keys(clusters)) {
     const clusterNodes = {};
     const clusterEdges = [];
-    const queue = [];
     const cluster = clusters[key];
+    const relatedACDCClusters = {};
 
     // Reformat element name
     const elements = cluster.elements.map(element => {
@@ -80,6 +96,10 @@ const createClusterGraph = async () => {
     elements.forEach(element => {
       clusterNodes[element] = Object.assign({}, nodeMap[element]);
       clusterNodes[element].groupId = CLUSTER_ID;
+      const acdcClusterName = clusterNodes[element].acdcCluster;
+      if (!relatedACDCClusters[acdcClusterName]) {
+        relatedACDCClusters[acdcClusterName] = acdcClusterMap[acdcClusterName];
+      }
     });
 
     // Ensures edges between elements are included
@@ -101,6 +121,7 @@ const createClusterGraph = async () => {
     }
 
     const result = {
+      relatedACDCClusters,
       nodes: Object.keys(clusterNodes).map(key => clusterNodes[key]),
       edges: clusterEdges,
       groups: [
