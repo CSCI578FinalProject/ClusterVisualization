@@ -124,7 +124,7 @@ class Index extends React.Component {
         render: (text, record) => (
           <span>
             <Link href={`/visualization?id=${record.id}`}>
-              <a>Visualize</a>
+              <a target="_blank">Visualize</a>
             </Link>
           </span>
         )

@@ -26,7 +26,6 @@ export default function Graph(props) {
     if (graphRef.current) {
       graphRef.current.on('node:click', e => {
         const { item } = e;
-        console.log(item.getModel());
         handleNodeClick && handleNodeClick(item);
       });
     }
@@ -41,7 +40,9 @@ export default function Graph(props) {
         container: ref.current,
         width: calculatedWidth,
         height: calculatedHeight,
-        fitView: true,
+        layout: {
+          type: 'circular'
+        },
         modes: {
           default: [
             'drag-canvas',
@@ -59,11 +60,11 @@ export default function Graph(props) {
             }
           ]
         },
-        layout: {
-          type: 'dagre'
+        defaultNode: {
+          size: 20
         },
         defaultEdge: {
-          size: 1,
+          size: 2,
           style: {
             stroke: '#e2e2e2'
           }
@@ -78,13 +79,21 @@ export default function Graph(props) {
         },
         edgeStateStyles: {
           active: {
-            stroke: '#999'
+            stroke: '#000'
           }
         }
       });
       bindEvents();
     }
-
+    data.nodes.sort((lhs, rhs) => {
+      if (lhs.groupId === rhs.groupId) {
+        return 0;
+      } else if (lhs.groupId < rhs.groupId) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
     graphRef.current.data(data);
 
     graphRef.current.render();
