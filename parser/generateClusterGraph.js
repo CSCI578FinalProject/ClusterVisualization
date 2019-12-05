@@ -53,6 +53,8 @@ const createClusterGraph = async () => {
   const clusters = await fs.readJson(clusterFilename);
   const graph = await fs.readJson(graphFilename);
   const acdcClusters = await fs.readJson(acdcClusterFilename);
+  // Removes previous results
+  await fs.remove(`${folderName}/*`);
   const acdcClusterMap = acdcClusters.clusterMap;
   const acdcClassMap = acdcClusters.classMap;
 
@@ -131,7 +133,7 @@ const createClusterGraph = async () => {
         }
       ]
     };
-
+    // Removes previous files
     fs.outputJSON(`${folderName}/${cluster.id}.json`, result);
   }
 };

@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { Layout, Typography, List, Collapse } from 'antd';
+import path from 'path';
 const { Header, Content, Sider } = Layout;
 const { Title, Text } = Typography;
 const { Item } = List;
