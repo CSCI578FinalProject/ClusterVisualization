@@ -18,16 +18,17 @@ insertCss(`
   }
 `);
 
+// Registers custom edge
 G6.registerEdge(
   'line-arrow',
   {
     getShapeStyle(cfg) {
+      // Generates line path
       const startPoint = cfg.startPoint;
       const endPoint = cfg.endPoint;
-      let points = [startPoint]; // 添加起始点
-      // 添加结束点
-      points.push(endPoint);
+      let points = [startPoint, endPoint];
       const path = this.getPath(points);
+
       const style = G6.Util.mix(
         {},
         G6.Global.defaultEdge.style,
@@ -120,6 +121,8 @@ export default function Graph(props) {
       });
       bindEvents();
     }
+
+    // Sorts nodes to make nodes grouped together according to groupId
     data.nodes.sort((lhs, rhs) => {
       if (lhs.groupId === rhs.groupId) {
         return 0;
@@ -130,10 +133,7 @@ export default function Graph(props) {
       }
     });
     graphRef.current.data(data);
-
     graphRef.current.render();
-
-    const edges = graphRef.current.getEdges();
     graphRef.current.paint();
   }, [data]);
 

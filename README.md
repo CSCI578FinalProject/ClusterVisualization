@@ -30,6 +30,10 @@ After the above data is created, you can launch the visualization application
 using following commands
 
 ```bash
-# Launch the pages on your local machine
+# Launches the pages on your local machine
 npm run dev
+
+# Creates a built version of the pages
+npm run build
+npm run start
 ```
