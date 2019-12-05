@@ -4,6 +4,7 @@ import insertCss from 'insert-css';
 
 import { defaultContainerWidth, defaultContainerHeight } from '../constants';
 
+// Following code is based on examples from https://g6.antv.vision/en/examples/
 insertCss(`
   .g6-tooltip {
     border: 1px solid #e2e2e2;
@@ -16,6 +17,36 @@ insertCss(`
     white-space:pre-wrap;
   }
 `);
+
+G6.registerEdge(
+  'line-arrow',
+  {
+    getShapeStyle(cfg) {
+      const startPoint = cfg.startPoint;
+      const endPoint = cfg.endPoint;
+      let points = [startPoint]; // 添加起始点
+      // 添加结束点
+      points.push(endPoint);
+      const path = this.getPath(points);
+      const style = G6.Util.mix(
+        {},
+        G6.Global.defaultEdge.style,
+        {
+          stroke: '#BBB',
+          lineWidth: 1,
+          path,
+          endArrow: {
+            path: 'M 6,0 L -6,-6 L -3,0 L -6,6 Z',
+            d: 6
+          }
+        },
+        cfg.style
+      );
+      return style;
+    }
+  },
+  'line'
+);
 
 export default function Graph(props) {
   const ref = useRef();
@@ -67,6 +98,7 @@ export default function Graph(props) {
           size: 20
         },
         defaultEdge: {
+          shape: 'line-arrow',
           size: 2,
           style: {
             stroke: '#e2e2e2'
