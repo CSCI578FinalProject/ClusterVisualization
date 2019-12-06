@@ -65,4 +65,4 @@ npm run start
 
 https://github.com/zeit/next.js/issues/7929 current version of `next.js` may have
 out of memory issues while compiling files. If it doesn't work after trying advices
-provided in the issue, please contact us for a compiled version.
+provided in the issue, a pre-built version and sample data is provided in `build` branch.
