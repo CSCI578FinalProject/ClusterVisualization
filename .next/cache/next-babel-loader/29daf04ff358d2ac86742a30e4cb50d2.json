@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const defaultContainerWidth = 1200;\nexport const defaultContainerHeight = 800;","map":null,"metadata":{},"sourceType":"module"}
