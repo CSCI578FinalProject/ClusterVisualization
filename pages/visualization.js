@@ -57,18 +57,55 @@ function Visualization(props) {
             width={300}
             style={{ background: '#fff', padding: '0.25rem 0.5rem' }}
           >
-            <Collapse bordered={false} defaultActiveKey="1">
+            <Collapse bordered={false} defaultActiveKey={['1', '2']}>
               <Panel header="Elements" key="1">
-                <div style={{ maxHeight: 400, overflow: 'auto' }}></div>
-                {clusterListData.map(item => {
-                  return (
-                    <Item key={item.id}>
-                      <Text>{item.label}</Text>
-                    </Item>
-                  );
-                })}
+                <div style={{ maxHeight: 400, overflow: 'auto' }}>
+                  {clusterListData.map(item => {
+                    return (
+                      <Item key={item.id}>
+                        <Text>{item.label}</Text>
+                      </Item>
+                    );
+                  })}
+                </div>
               </Panel>
-              <Panel header="ACDC Clusters" key="2">
+              <Panel header="Used ACDC Clusters" key="2">
+                <div style={{ maxHeight: 400, overflow: 'auto' }}>
+                  <Collapse bordered={false}>
+                    {acdcClusterListData.map(item => {
+                      return (
+                        <Panel key={item.id} header={item.cluster}>
+                          <div style={{ overflow: 'auto' }}>
+                            {item.elements
+                              .filter(element => {
+                                return !!usedClasses[element];
+                              })
+                              .map(element => {
+                                return (
+                                  <Item key={element}>
+                                    <Text>{element}</Text>
+                                  </Item>
+                                );
+                              })}
+                          </div>
+                        </Panel>
+                      );
+                    })}
+                  </Collapse>
+                </div>
+              </Panel>
+              <Panel header="Neighbors" key="3">
+                <div style={{ maxHeight: 400, overflow: 'auto' }}>
+                  {neighborListData.map(item => {
+                    return (
+                      <Item key={item.id}>
+                        <Text>{item.label}</Text>
+                      </Item>
+                    );
+                  })}
+                </div>
+              </Panel>
+              <Panel header="Full ACDC Clusters" key="4">
                 <div style={{ maxHeight: 400, overflow: 'auto' }}>
                   <Collapse bordered={false}>
                     {acdcClusterListData.map(item => {
@@ -92,17 +129,6 @@ function Visualization(props) {
                       );
                     })}
                   </Collapse>
-                </div>
-              </Panel>
-              <Panel header="Neighbors" key="3">
-                <div style={{ maxHeight: 400, overflow: 'auto' }}>
-                  {neighborListData.map(item => {
-                    return (
-                      <Item key={item.id}>
-                        <Text>{item.label}</Text>
-                      </Item>
-                    );
-                  })}
                 </div>
               </Panel>
             </Collapse>
