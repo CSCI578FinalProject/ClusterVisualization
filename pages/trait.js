@@ -7,7 +7,7 @@ import TextArea from 'antd/lib/input/TextArea';
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 
-class Index extends React.Component {
+class Trait extends React.Component {
   state = {
     searchText: '',
     searchedColumn: '',
@@ -261,9 +261,9 @@ class Index extends React.Component {
   }
 }
 
-Index.getInitialProps = async function() {
+Trait.getInitialProps = async function() {
   const data = await import('../parser/cluster.json');
   return { data: data['default'] };
 };
 
-export default Index;
+export default Trait;
