@@ -24,7 +24,7 @@ class Trait extends React.Component {
   generateColumns = () => {
     return [
       {
-        title: 'Cluster',
+        title: 'Functional Sections',
         dataIndex: 'cluster',
         key: 'cluster',
         ...this.getColumnSearchProps('cluster')
@@ -245,7 +245,7 @@ class Trait extends React.Component {
             ></TextArea>
           </section>
           <section>
-            <Title level={4}>Clusters</Title>
+            <Title level={4}>Functional Sections</Title>
             <Table
               style={{
                 maxHeight: '80vh'

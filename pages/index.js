@@ -105,7 +105,7 @@ class Index extends React.Component {
 
     const columns = [
       {
-        title: 'Cluster',
+        title: 'Functional Sections',
         dataIndex: 'cluster',
         key: 'cluster',
         ...this.getColumnSearchProps('cluster')
